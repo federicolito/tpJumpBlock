@@ -47,7 +47,7 @@ public class JumpBlock extends BasicGame{
         contenedor.setShowFPS(true);
         //personaje
         personaje = new Bloque(new Rectangle(400,400,30,30),1000,0.02,gravity);
-        //bloques enemigos hola
+        //bloques enemigos
         bloque[0] = new Bloque(new Rectangle(10,100,30,30),50,0.02,gravity);
         bloque[1] = new Bloque(new Rectangle(400,-1000,200,200),50,0.02,gravity);
         bloque[2] = new Bloque(new Rectangle(100,-300,200,200),50,0.02,gravity);
