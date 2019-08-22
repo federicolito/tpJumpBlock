@@ -24,7 +24,7 @@ public class JumpBlock extends BasicGame{
     private Audio audio2 = new Audio();
     private AudioClip pelotaPiso = audio2.getAudio("/recursos/personajeGolpePiso.wav");
     //actualizaciones por segundo
-    private double ups = 100;
+    private double ups = 1000;
     //gravedad
     private double gravity = 9.81;
     //bloques
