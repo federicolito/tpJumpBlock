@@ -6,8 +6,8 @@
 package jumpblock;
 
 import java.applet.AudioClip;
-import java.awt.Graphics2D;
 import obtenerRecursos.Audio;
+import org.lwjgl.input.Mouse;
 import org.newdawn.slick.*;
 import org.newdawn.slick.geom.Rectangle;
 
@@ -21,17 +21,23 @@ public class JumpBlock extends BasicGame{
     //sonidos
     private Audio audio = new Audio();
     private AudioClip rebote_1 = audio.getAudio("/recursos/bouncing.wav");
+    private Audio audio2 = new Audio();
+    private AudioClip pelotaPiso = audio2.getAudio("/recursos/personajeGolpePiso.wav");
     //actualizaciones por segundo
-    private double ups = 500;
+    private double ups = 10000;
     //gravedad
     private double gravity = 9.81;
     //bloques
-    public Bloque[] bloque = new Bloque[4];
+    public Bloque[] bloque = new Bloque[6];
     private Bloque personaje;
     private double[] vX = new double[bloque.length];
     private double[] vY = new double[bloque.length];
     private double vPersonaje;
     private double vYPersonaje;
+    public String mouse = "";
+    int xPosM ;
+    int yPosM ;
+    private Image imagen;
     
     //contructor
     public JumpBlock(String title) throws SlickException {
@@ -40,25 +46,31 @@ public class JumpBlock extends BasicGame{
         contenedor.setDisplayMode(1366, 700, false);
         contenedor.setShowFPS(true);
         //personaje
-        personaje = new Bloque(new Rectangle(400,40,100,100),100,0.02,gravity);
+        personaje = new Bloque(new Rectangle(400,400,30,30),1000,0.02,gravity);
         //bloques enemigos
-        bloque[0] = new Bloque(new Rectangle(100,40,50,50),50,0.02,gravity);
-        bloque[1] = new Bloque(new Rectangle(100,100,50,50),50,0.02,gravity);
-        bloque[2] = new Bloque(new Rectangle(100,300,50,50),50,0.02,gravity);
-        bloque[3] = new Bloque(new Rectangle(400,-400,50,50),50,0.02,gravity);
+        bloque[0] = new Bloque(new Rectangle(10,100,30,30),50,0.02,gravity);
+        bloque[1] = new Bloque(new Rectangle(400,-1000,200,200),50,0.02,gravity);
+        bloque[2] = new Bloque(new Rectangle(100,-300,200,200),50,0.02,gravity);
+        bloque[3] = new Bloque(new Rectangle(100,-3000,200,200),50,0.02,gravity);
+        bloque[4] = new Bloque(new Rectangle(100,-600,200,200),50,0.02,gravity);
+        bloque[5] = new Bloque(new Rectangle(100,-2000,200,200),50,0.02,gravity);
+       
+
 
         
         
     }
     //metodos heredados de la libreria slick2D
     @Override
-    public void init(GameContainer gc) throws SlickException {    
+    public void init(GameContainer gc) throws SlickException {
+        imagen= new Image("recursos/olas.gif");
     }
     @Override
     public void update(GameContainer gc, int i) throws SlickException {
         entrada = contenedor.getInput();
+        actualizarMouse();
         updateBloques();
-        moverPersonaje();    
+        moverPersonaje();
     }
     @Override
     public void render(GameContainer gc, Graphics grphcs) throws SlickException {
@@ -66,22 +78,21 @@ public class JumpBlock extends BasicGame{
         grphcs.setColor(org.newdawn.slick.Color.blue);
         drawBloques(grphcs);
         grphcs.setColor(org.newdawn.slick.Color.black);
-        grphcs.fillRect(personaje.getRectangle().getX(),personaje.getRectangle().getY(),personaje.getRectangle().getWidth(),personaje.getRectangle().getHeight());
+        imagen.setCenterOfRotation(personaje.getRectangle().getWidth()/2, personaje.getRectangle().getHeight()/2);
+        imagen.draw(personaje.getRectangle().getX(),personaje.getRectangle().getY(), personaje.getRectangle().getWidth(),personaje.getRectangle().getHeight());
         grphcs.setColor(org.newdawn.slick.Color.red);
-        drawCord(grphcs);
-        drawCordPersonaje(grphcs);
         
-        for (int i = 0;i < bloque.length;i ++){
-            if (personaje.colide(bloque[i])){
-                grphcs.drawString("ta chocando", 0, 0);
-            }
-            if (personaje.colide(bloque[i])){
-                grphcs.drawString("tambien ta chocando", 200, 0);
-            }
-        }puto
+        dibujarMouse(grphcs);
+        
+//        drawCord(grphcs);
+//        drawCordPersonaje(grphcs);
     }
     //metodos
     //METODOS DE ACTUALIZACIONES
+    public void actualizarMouse(){
+        xPosM = Mouse.getX();
+        yPosM = Mouse.getY();
+    }
     public void updateBloques(){
         /*para no cambiar la velocidad por la cantidad de actualizacioes cree un bucle for que se 
         repite hasta alcanzar las UPS y divido la velocidad de cada bloque la divido por las UPS*/
@@ -92,8 +103,7 @@ public class JumpBlock extends BasicGame{
                     //PRIMERO VERIFICO COLISIONES ENTRE LOS ENEMIGOS
                     //EL PRIMER "IF" LO UTILIZO PARA QUE UN MISMO BLOQUE NO DETETE COLISIONES CON EL MISMO
                     if (i != q){
-                        
-                        if (!bloque[i].hitFloor((int)contenedor.getHeight(),bloque[q])){
+                        if (!bloque[i].hitFloor((int)contenedor.getHeight(),bloque[q]) & !bloque[i].hitFloor((int)contenedor.getHeight(),personaje)){
                             bloque[i].setvY(bloque[i].getvY()+((gravity/(ups*6))/ups));
                             bloque[i].setFalling(true);
                         }else{
@@ -104,63 +114,48 @@ public class JumpBlock extends BasicGame{
                             }else{
                                 bloque[i].reverseVY(0.707);
                                 rebote_1.play();
-
                             }
                         }
-                        
                         if(bloque[i].colide(bloque[q])){
                             //calculo las velocidades en caso de colision 
-
                             vX[i] = bloque[i].calcularV(bloque[q],true);
                             vX[q] = bloque[q].calcularV(bloque[i],true); 
                             bloque[i].setvX(vX[i]);
                             bloque[q].setvX(vX[q]);
                             /*EL SIQUIENTE "if" LO UTILIZO PARA QUE EN CASO DE COLISION LOS BLOQUES SE POSICIONEN 
                             JUSTO AL LADO DEL OTRO PARA EVITAR QUE SE TRASPASEN*/
-                            
-                            
-                            
-                        }
-                        
-                        if ((float) bloque[i].getvY() != 0){
-                            bloque[i].setFalling(true);
+                            if (bloque[i].getRectangle().getX()<bloque[q].getRectangle().getX()){
+                                bloque[i].getRectangle().setX(bloque[i].getRectangle().getX()-(bloque[i].getRectangle().getX()+bloque[i].getRectangle().getWidth() - bloque[q].getRectangle().getX()));
+                                rebote_1.play();  
+                            }else{
+                                bloque[i].getRectangle().setX(bloque[i].getRectangle().getX()+(bloque[q].getRectangle().getX()+bloque[q].getRectangle().getWidth()-bloque[i].getRectangle().getX()));
+                                rebote_1.play();  
+                            }
                         }
                     }
                 }
                 //colisiones del persnaje contra los bloques
                 if(personaje.colide(bloque[i])){
-                        //calculo las velocidades en caso de colision 
+                    //calculo las velocidades en caso de colision 
                     vPersonaje = personaje.calcularV(bloque[i],true);
                     vX[i] = bloque[i].calcularV(personaje,true);
                     personaje.setvX(vPersonaje);
-                    bloque[i].setvX(vX[i]); 
+                    bloque[i].setvX(vX[i]);
                     /*EL SIQUIENTE "if" LO UTILIZO PARA QUE EN CASO DE COLISION LOS BLOQUES SE POSICIONEN 
                     JUSTO AL LADO DEL OTRO PARA EVITAR QUE SE TRASPASEN*/  
-                    
-                    
-                    
-                }
-                //el siguiente if sirve para que si un bloque esta tocando el piso sufra friccion
-                if (bloque[i].hitFloor((int)((int)contenedor.getHeight()-bloque[i].getRectangle().getHeight()))){
-                    if(bloque[i].getvX() > 0.0){
-                        bloque[i].setvX(bloque[i].getvX()-((bloque[i].getAceleracionX()/ups)/ups));  
-                    }
-                    if(bloque[i].getvX() < 0.0){
-                        bloque[i].setvX(bloque[i].getvX()+((bloque[i].getAceleracionX()/ups)/ups));  
-                    }
-                }
-                //esto es para verificar colisiones de la pared
-                if (bloque[i].hitWall(contenedor.getWidth())){
-                    bloque[i].reverseVX(1);
-                    if (bloque[i].getRectangle().getX()<0){
-                        bloque[i].getRectangle().setX(0);
+                    if (personaje.getRectangle().getX()<bloque[i].getRectangle().getX()){
+                        personaje.getRectangle().setX(personaje.getRectangle().getX()-(personaje.getRectangle().getX()+personaje.getRectangle().getWidth() - bloque[i].getRectangle().getX()));
                         rebote_1.play();  
                     }else{
-                        bloque[i].getRectangle().setX(contenedor.getWidth()-bloque[i].getRectangle().getWidth());
+                        personaje.getRectangle().setX(personaje.getRectangle().getX()+(bloque[i].getRectangle().getX()+bloque[i].getRectangle().getWidth()-personaje.getRectangle().getX()));
                         rebote_1.play();  
-                    }                  
+                    }
                 }
-                
+                //lo siguiente sirve para que si un bloque esta tocando el piso sufra friccion
+                bloque[i].sufrirFriccion(contenedor.getHeight(),ups,true);
+                bloque[i].sufrirFriccion(contenedor.getHeight(),ups,false);
+                //esto es para verificar colisiones de la pared
+                bloque[i].hitWall(contenedor.getWidth(),rebote_1);
                 //actualizo la posicion del bloque
                 bloque[i].update();
             }
@@ -173,68 +168,55 @@ public class JumpBlock extends BasicGame{
             if (entrada.isKeyDown(Input.KEY_RIGHT)){   
                 if(personaje.getvX()< 15/ups){
                     personaje.setvX(personaje.getvX()+((personaje.getAceleracionX()/ups)/ups));
-                } 
-            }else{
-                if (personaje.hitFloor((int) (contenedor.getHeight()-personaje.getRectangle().getHeight()))){
-                    if(personaje.getvX() > (double)0.0){
-                        personaje.setvX(personaje.getvX()-((personaje.getAceleracionX()/ups)/ups));  
-                    }
+                    
                 }
+            }else{
+                personaje.sufrirFriccion(contenedor.getHeight(),ups,false);
             }
             if (entrada.isKeyDown(Input.KEY_LEFT)){
                 if(personaje.getvX() > -15/ups){
                     personaje.setvX(personaje.getvX()-((personaje.getAceleracionX()/ups)/ups));
+                      
                 }
             }else{
-                if (personaje.hitFloor((int) contenedor.getHeight())){
-                    if(personaje.getvX() < (double)0.0 ){
-                        personaje.setvX(personaje.getvX()+((personaje.getAceleracionX()/ups)/ups));  
-                    }
-                }
+                personaje.sufrirFriccion(contenedor.getHeight(),ups,true);
             }
             if (!personaje.isJumping()){
                 if (entrada.isKeyPressed(Input.KEY_UP)){
                     personaje.setvYSalto(-30/ups);
-                    personaje.setvY(personaje.getvYSalto());
                     personaje.update();
                     personaje.setFalling(true);
                     personaje.setJumping(true);
                 }
             }
-           
             for(int i = 0;i < bloque.length;i ++){
-                if (!personaje.hitFloor((int) contenedor.getHeight(),bloque[i])){
+                if (!personaje.hitFloor((int) contenedor.getHeight(),bloque[i]) || personaje.colide(bloque[i])){
                     personaje.setFalling(true);
-                    personaje.setvY(personaje.getvY()+((gravity/(ups*6))/ups)/bloque.length);
+                    
                 }else{
-                    if ((float) personaje.getvY() == 0){
+                    if ((float)personaje.getvY() <= 0.0){
                         personaje.setFalling(false);
-                        personaje.setJumping(false);
-
                     }else{
-                        personaje.reverseVY(0.8);
-                        rebote_1.play();
+                        personaje.reverseVY(0);
+                        personaje.setJumping(false);
                     }
                 }
             }
-            
+            personaje.caer(ups);
             //esto es para verificar colisiones de la pared
-            if (personaje.hitWall(contenedor.getWidth())){
-                personaje.reverseVX(1);
-                if (personaje.getRectangle().getX()<0){
-                    personaje.getRectangle().setX(0);
-                    rebote_1.play();  
-                }else{
-                    personaje.getRectangle().setX(contenedor.getWidth()-personaje.getRectangle().getWidth());
-                    rebote_1.play();  
-                }                  
-            }
+            personaje.hitWall(contenedor.getWidth(),pelotaPiso);
+            //actualizo la posicion del bloque
             personaje.update();
         }
     }
     
     
     //METOSDOS DE DIBUJO DE LOS PERSONAJES
+    public void dibujarMouse(Graphics grphcs){
+        grphcs.drawLine(personaje.getRectangle().getX()+personaje.getRectangle().getWidth()/2,personaje.getRectangle().getY()+personaje.getRectangle().getHeight()/2,xPosM,contenedor.getHeight()-yPosM);
+        grphcs.setLineWidth(6);
+        grphcs.drawOval(xPosM-10,contenedor.getHeight()-yPosM-10, 20, 20);
+    }
     //dibujo todos los bloques enemigos
     public void drawBloques(Graphics grphcs){
         for (int i = 0;i<bloque.length;i++){

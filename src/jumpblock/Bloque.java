@@ -5,6 +5,8 @@
  */
 package jumpblock;
 
+import java.applet.AudioClip;
+import org.newdawn.slick.Image;
 import org.newdawn.slick.geom.Rectangle;
 
 
@@ -46,10 +48,14 @@ public class Bloque {
     
     
     //metodos
-
     public void update(){
         rectangle.setX((float) (rectangle.getX()+ vX)); 
-        rectangle.setY((float) (rectangle.getY()+ vY)); 
+        rectangle.setY((float) (rectangle.getY()+ vY));
+    }
+    public void caer(double ups){
+        if (falling){
+            vY += (gravity/(ups*6))/ups;
+        }
     }
     //calcula la velocidad final en base a choque elastico
     public double calcularV(Bloque b,boolean queV){
@@ -65,30 +71,57 @@ public class Bloque {
     public boolean colide(Bloque b){
         return (rectangle.intersects(b.getRectangle()));
     }
+    public boolean colideY(Bloque b){
+        return !(getRectangle().getY() + getRectangle().getHeight() + 0.5 <= b.getRectangle().getY() ^ (getRectangle().getX() + getRectangle().getWidth() < b.getRectangle().getX() || getRectangle().getX() > b.getRectangle().getX() + b.getRectangle().getWidth()) || getRectangle().getY() - 0.5  >= b.getRectangle().getY() +  b.getRectangle().getHeight() ^ (getRectangle().getX() + getRectangle().getWidth() < b.getRectangle().getX() || getRectangle().getX() > b.getRectangle().getX() + b.getRectangle().getWidth()));
+    }
     //verifica colisiones en la pared
-    public boolean hitWall(int i){
-        return (rectangle.getX() <= 0 || rectangle.getX() + rectangle.getWidth() >= i);
+    public void hitWall(int i, AudioClip rebote_1){
+        if(rectangle.getX() <= 0 || rectangle.getX() + rectangle.getWidth() >= i){
+            reverseVX(1);
+            if (getRectangle().getX()<0){
+                rectangle.setX(0);
+                rebote_1.play();  
+            }else{
+                rectangle.setX(i-rectangle.getWidth());
+                rebote_1.play();  
+            }
+        }
     }
     //caltcula el rebote segun la restitucion, osea la energia que es absorvida por la pared
     public void reverseVX(double restitucion){
         vX = -vX*restitucion;
     }
     //verifica colisiones en el piso
-    public boolean hitFloor(int i,Bloque b){
-        return (rectangle.getY()+rectangle.getHeight() >= i || colide(b));
-        
+    public boolean hitFloor(double i,Bloque b){
+        return (rectangle.getY()+rectangle.getHeight() >= i || colideY(b));
     }
-    public boolean hitFloor(int i){
-        return (rectangle.getY()+rectangle.getHeight() >= i);
-        
+    public void sufrirFriccion(int i, double ups,boolean derizq){
+        if (rectangle.getY()+rectangle.getHeight() >= i){
+            if(derizq){
+                if(vX < (double)0.0){
+                    vX += (aceleracionX/ups)/ups;  
+                    
+                }
+            }else{
+                if(vX > (double)0.0){
+                    vX -= (aceleracionX/ups)/ups; 
+                    
+                }
+            }
+        }
     }
     //caltcula el rebote segun la restitucion, osea la energia que es absorvida por el piso
     public void reverseVY(double restitucion){
         vY = -vY*restitucion;
     }
-
+    
+    
+    
+    
+    
+    
+    
     //setters and getters
-
     public double getvX() {
         return vX;
     }
@@ -111,6 +144,7 @@ public class Bloque {
 
     public void setvYSalto(double vYSalto) {
         this.vYSalto = vYSalto;
+        vY = vYSalto;
     }
 
     public double getAceleracionX() {
