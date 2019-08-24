@@ -56,7 +56,7 @@ public class JumpBlock extends BasicGame{
         bloque[5] = new Bloque(new Rectangle(100,-2000,200,200),50,0.02,gravity);
        
 
-
+        System.out.println("fedeputo");
         
         
     }
