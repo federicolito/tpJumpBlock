@@ -18,7 +18,11 @@ public class Main {
      */
     public static void main(String[] args) throws SlickException {
         JumpBlock sm = new JumpBlock("Simulador Fisica");
-        VentanaInicio vI = new VentanaInicio("title",sm);
+        Ventana v = new Ventana(sm);
+        v.abrir();
+        v.iniciarventana();
+        v.iniciarelementos();
+       
     }
     
 }

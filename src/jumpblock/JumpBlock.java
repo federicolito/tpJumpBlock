@@ -63,7 +63,7 @@ public class JumpBlock extends BasicGame{
     //metodos heredados de la libreria slick2D
     @Override
     public void init(GameContainer gc) throws SlickException {
-        imagen= new Image("recursos/olas.gif");
+        imagen= new Image("recursos/titulo.png");
     }
     @Override
     public void update(GameContainer gc, int i) throws SlickException {
@@ -103,19 +103,6 @@ public class JumpBlock extends BasicGame{
                     //PRIMERO VERIFICO COLISIONES ENTRE LOS ENEMIGOS
                     //EL PRIMER "IF" LO UTILIZO PARA QUE UN MISMO BLOQUE NO DETETE COLISIONES CON EL MISMO
                     if (i != q){
-                        if (!bloque[i].hitFloor((int)contenedor.getHeight(),bloque[q]) & !bloque[i].hitFloor((int)contenedor.getHeight(),personaje)){
-                            bloque[i].setvY(bloque[i].getvY()+((gravity/(ups*6))/ups));
-                            bloque[i].setFalling(true);
-                        }else{
-                            if ((float) bloque[i].getvY() == 0){
-                                bloque[i].setFalling(false);
-                                bloque[i].setvY(0.0);
-
-                            }else{
-                                bloque[i].reverseVY(0.707);
-                                rebote_1.play();
-                            }
-                        }
                         if(bloque[i].colide(bloque[q])){
                             //calculo las velocidades en caso de colision 
                             vX[i] = bloque[i].calcularV(bloque[q],true);
@@ -132,6 +119,20 @@ public class JumpBlock extends BasicGame{
                                 rebote_1.play();  
                             }
                         }
+                        if (!bloque[i].hitFloor((int)contenedor.getHeight(),bloque[q]) & !bloque[i].hitFloor((int)contenedor.getHeight(),personaje)){
+                            bloque[i].setvY(bloque[i].getvY()+((gravity/(ups*6))/ups));
+                            bloque[i].setFalling(true);
+                        }else{
+                            if ((float) bloque[i].getvY() == 0){
+                                bloque[i].setFalling(false);
+                                bloque[i].setvY(0.0);
+
+                            }else{
+                                bloque[i].reverseVY(0.707);
+                                rebote_1.play();
+                            }
+                        }
+                        
                     }
                 }
                 //colisiones del persnaje contra los bloques
