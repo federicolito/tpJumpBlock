@@ -3,9 +3,15 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/sironi_federico/NetBeansProjects/JumpBlock/src/jumpblock/JumpBlock.java</file>
-            <file>file:/home/sironi_federico/NetBeansProjects/JumpBlock/src/jumpblock/Main.java</file>
-            <file>file:/home/sironi_federico/NetBeansProjects/JumpBlock/src/jumpblock/Bloque.java</file>
+            <file>file:/home/sironi_federico/Documentos/5año/Programacion/JumpBlock/src/recursos/bala.png</file>
+            <file>file:/home/sironi_federico/Documentos/5año/Programacion/JumpBlock/src/jumpblock/Arma.java</file>
+            <file>file:/home/sironi_federico/Documentos/5año/Programacion/JumpBlock/src/obtenerRecursos/Audio.java</file>
+            <file>file:/home/sironi_federico/Documentos/5año/Programacion/JumpBlock/src/jumpblock/Main.java</file>
+            <file>file:/home/sironi_federico/Documentos/5año/Programacion/JumpBlock/src/jumpblock/Bala.java</file>
+            <file>file:/home/sironi_federico/Documentos/5año/Programacion/JumpBlock/src/jumpblock/Bloque.java</file>
+            <file>file:/home/sironi_federico/Documentos/5año/Programacion/JumpBlock/src/jumpblock/Object.java</file>
+            <file>file:/home/sironi_federico/Documentos/5año/Programacion/JumpBlock/src/jumpblock/Ventana.java</file>
+            <file>file:/home/sironi_federico/Documentos/5año/Programacion/JumpBlock/src/jumpblock/JumpBlock.java</file>
         </group>
     </open-files>
 </project-private>

@@ -21,49 +21,49 @@ public class JumpBlock extends BasicGame{
     //sonidos
     private Audio audio = new Audio();
     private AudioClip rebote_1 = audio.getAudio("/recursos/bouncing.wav");
-    private Audio audio2 = new Audio();
-    private AudioClip pelotaPiso = audio2.getAudio("/recursos/personajeGolpePiso.wav");
+    private AudioClip pelotaPiso = audio.getAudio("/recursos/personajeGolpePiso.wav");
+    private AudioClip disparo = audio.getAudio("/recursos/disparo.wav");
+    private AudioClip explosion = audio.getAudio("/recursos/choqueBala.wav");
     //actualizaciones por segundo
-    private double ups = 1000;
+    private float ups = 500f;
     //gravedad
-    private double gravity = 9.81;
+    private float gravity = 9.81f;
     //bloques
-    public Bloque[] bloque = new Bloque[6];
+    public Bloque[] bloque = new Bloque[7];
+    private float[] vX = new float[bloque.length];
+    private float[] vY = new float[bloque.length];
     private Bloque personaje;
-    private double[] vX = new double[bloque.length];
-    private double[] vY = new double[bloque.length];
-    private double vPersonaje;
-    private double vYPersonaje;
-    public String mouse = "";
+    private float vPersonaje;
+    private float vYPersonaje;
     int xPosM ;
     int yPosM ;
-    private Image imagen;
+    private Image imagenBloque;
+    private Image imagenBloque2;
+    private Image imagenArma;
+    private String nombre;
+    
     
     //contructor
     public JumpBlock(String title) throws SlickException {
         super(title);
         contenedor = new AppGameContainer(this);
-        contenedor.setDisplayMode(1366, 700, false);
+        contenedor.setDisplayMode(1000, 700, false);
         contenedor.setShowFPS(true);
         //personaje
-        personaje = new Bloque(new Rectangle(400,400,30,30),1000,0.02,gravity);
-        //bloques enemigos
-        bloque[0] = new Bloque(new Rectangle(10,100,30,30),50,0.02,gravity);
-        bloque[1] = new Bloque(new Rectangle(400,-1000,200,200),50,0.02,gravity);
-        bloque[2] = new Bloque(new Rectangle(100,-300,200,200),50,0.02,gravity);
-        bloque[3] = new Bloque(new Rectangle(100,-3000,200,200),50,0.02,gravity);
-        bloque[4] = new Bloque(new Rectangle(100,-600,200,200),50,0.02,gravity);
-        bloque[5] = new Bloque(new Rectangle(100,-2000,200,200),50,0.02,gravity);
-       
 
-        System.out.println("fedeputo");
         
         
     }
     //metodos heredados de la libreria slick2D
     @Override
     public void init(GameContainer gc) throws SlickException {
-        imagen= new Image("recursos/titulo.png");
+        imagenBloque = new Image("recursos/cubo.png");
+        imagenBloque2 = new Image("recursos/cubo2.png");
+        personaje = new Bloque(new Rectangle(300,400,60,60),60,0.5f,gravity,imagenBloque);
+        //bloques enemigos
+        for(int i =0 ;i<bloque.length;i++){
+            bloque[i] = new Bloque(new Rectangle(100*i,-100*i,(float)Math.random()*40+10,(float)Math.random()*40+10),(float)Math.random()*40+1,0.5f,gravity,imagenBloque2);
+        }
     }
     @Override
     public void update(GameContainer gc, int i) throws SlickException {
@@ -75,17 +75,14 @@ public class JumpBlock extends BasicGame{
     @Override
     public void render(GameContainer gc, Graphics grphcs) throws SlickException {
         grphcs.setBackground(Color.white);
-        grphcs.setColor(org.newdawn.slick.Color.blue);
         drawBloques(grphcs);
-        grphcs.setColor(org.newdawn.slick.Color.black);
-        imagen.setCenterOfRotation(personaje.getRectangle().getWidth()/2, personaje.getRectangle().getHeight()/2);
-        imagen.draw(personaje.getRectangle().getX(),personaje.getRectangle().getY(), personaje.getRectangle().getWidth(),personaje.getRectangle().getHeight());
+        personaje.draw(grphcs);
         grphcs.setColor(org.newdawn.slick.Color.red);
-        
         dibujarMouse(grphcs);
-        
+        grphcs.drawString(nombre, personaje.getRectangle().getX(),personaje.getRectangle().getY());
 //        drawCord(grphcs);
 //        drawCordPersonaje(grphcs);
+//        grphcs.drawString("angulo" + arma.angulo, 0, 0);
     }
     //metodos
     //METODOS DE ACTUALIZACIONES
@@ -103,7 +100,7 @@ public class JumpBlock extends BasicGame{
                     //PRIMERO VERIFICO COLISIONES ENTRE LOS ENEMIGOS
                     //EL PRIMER "IF" LO UTILIZO PARA QUE UN MISMO BLOQUE NO DETETE COLISIONES CON EL MISMO
                     if (i != q){
-                        if(bloque[i].colide(bloque[q])){
+                        if(bloque[i].isColiding(bloque[q])){
                             //calculo las velocidades en caso de colision 
                             vX[i] = bloque[i].calcularV(bloque[q],true);
                             vX[q] = bloque[q].calcularV(bloque[i],true); 
@@ -119,24 +116,19 @@ public class JumpBlock extends BasicGame{
                                 rebote_1.play();  
                             }
                         }
-                        if (!bloque[i].hitFloor((int)contenedor.getHeight(),bloque[q]) & !bloque[i].hitFloor((int)contenedor.getHeight(),personaje)){
-                            bloque[i].setvY(bloque[i].getvY()+((gravity/(ups*6))/ups));
+                        if (!bloque[i].isHittingFloor((int)contenedor.getHeight(),bloque[q]) & !bloque[i].isHittingFloor((int)contenedor.getHeight(),personaje)){
                             bloque[i].setFalling(true);
                         }else{
                             if ((float) bloque[i].getvY() == 0){
                                 bloque[i].setFalling(false);
-                                bloque[i].setvY(0.0);
-
                             }else{
-                                bloque[i].reverseVY(0.707);
-                                rebote_1.play();
+                                bloque[i].reverseVY(0);
                             }
                         }
-                        
                     }
                 }
                 //colisiones del persnaje contra los bloques
-                if(personaje.colide(bloque[i])){
+                if(personaje.isColiding(bloque[i])){
                     //calculo las velocidades en caso de colision 
                     vPersonaje = personaje.calcularV(bloque[i],true);
                     vX[i] = bloque[i].calcularV(personaje,true);
@@ -156,9 +148,33 @@ public class JumpBlock extends BasicGame{
                 bloque[i].sufrirFriccion(contenedor.getHeight(),ups,true);
                 bloque[i].sufrirFriccion(contenedor.getHeight(),ups,false);
                 //esto es para verificar colisiones de la pared
-                bloque[i].hitWall(contenedor.getWidth(),rebote_1);
+                bloque[i].isHittingWall(contenedor.getWidth(),rebote_1); 
+//                if (Math.floor(Math.random()*1000000) == 999){
+//                    bloque[i].getArma().disparar(ups);
+//                    disparo.play();
+//                }
+//                if (Math.floor(Math.random()*100000) == 129){
+//                    bloque[i].setvX(10/ups);
+//                }
+//                if (Math.floor(Math.random()*100000) == 367){
+//                    bloque[i].setvY(10/ups);
+//                }
+//                if (personaje.getArma().getBala().isColiding(bloque[i])){
+//                    bloque[i].setvY(-1000/ups);
+//                    bloque[i].setvX(-personaje.getArma().getBala().getvX());
+//                    personaje.getArma().getBala().setvX(0);
+//                    personaje.getArma().getBala().setvY(0);
+//                }
+//                if (bloque[i].getArma().getBala().colide(personaje)){
+//                    personaje.setFalling(true);
+//                    personaje.setvY(-100/ups);
+//                    personaje.setvX(-bloque[i].getArma().getBala().getvX());
+//                    bloque[i].getArma().getBala().setvX(0);
+//                    bloque[i].getArma().getBala().setvY(0);
+//                }
+                bloque[i].caer(ups);
                 //actualizo la posicion del bloque
-                bloque[i].update();
+                bloque[i].update(personaje.getRectangle().getX(),personaje.getRectangle().getY(),contenedor.getHeight(),contenedor.getWidth(),explosion);
             }
         }
     }
@@ -167,17 +183,15 @@ public class JumpBlock extends BasicGame{
         repite hasta alcanzar las UPS y divido la velocidad de cada bloque la divido por las UPS*/
         for(int n = 1;n < ups;n ++){
             if (entrada.isKeyDown(Input.KEY_RIGHT)){   
-                if(personaje.getvX()< 15/ups){
-                    personaje.setvX(personaje.getvX()+((personaje.getAceleracionX()/ups)/ups));
-                    
+                if(personaje.getvX()< 30/ups){
+                    personaje.setvX(personaje.getvX()+((personaje.getAceleracionX()/ups)/ups));  
                 }
             }else{
                 personaje.sufrirFriccion(contenedor.getHeight(),ups,false);
             }
             if (entrada.isKeyDown(Input.KEY_LEFT)){
-                if(personaje.getvX() > -15/ups){
-                    personaje.setvX(personaje.getvX()-((personaje.getAceleracionX()/ups)/ups));
-                      
+                if(personaje.getvX() > -30/ups){
+                    personaje.setvX(personaje.getvX()-((personaje.getAceleracionX()/ups)/ups)); 
                 }
             }else{
                 personaje.sufrirFriccion(contenedor.getHeight(),ups,true);
@@ -185,13 +199,20 @@ public class JumpBlock extends BasicGame{
             if (!personaje.isJumping()){
                 if (entrada.isKeyPressed(Input.KEY_UP)){
                     personaje.setvYSalto(-30/ups);
-                    personaje.update();
+                    personaje.update(xPosM,contenedor.getHeight()-yPosM,contenedor.getHeight(),contenedor.getWidth(),explosion);
                     personaje.setFalling(true);
                     personaje.setJumping(true);
                 }
             }
+            if (entrada.isMousePressed(Input.MOUSE_LEFT_BUTTON)){
+                personaje.getArma().disparar(ups);
+                disparo.play();
+            }
+            //esto es para verificar colisiones de la pared
+            personaje.isHittingWall(contenedor.getWidth(),pelotaPiso);
+            
             for(int i = 0;i < bloque.length;i ++){
-                if (!personaje.hitFloor((int) contenedor.getHeight(),bloque[i]) || personaje.colide(bloque[i])){
+                if (!personaje.isHittingFloor((int) contenedor.getHeight(),bloque[i]) || personaje.isColiding(bloque[i])){
                     personaje.setFalling(true);
                     
                 }else{
@@ -204,24 +225,23 @@ public class JumpBlock extends BasicGame{
                 }
             }
             personaje.caer(ups);
-            //esto es para verificar colisiones de la pared
-            personaje.hitWall(contenedor.getWidth(),pelotaPiso);
             //actualizo la posicion del bloque
-            personaje.update();
+            personaje.update(xPosM,contenedor.getHeight()-yPosM,contenedor.getHeight(),contenedor.getWidth(),explosion);
+            
         }
     }
     
     
     //METOSDOS DE DIBUJO DE LOS PERSONAJES
     public void dibujarMouse(Graphics grphcs){
-        grphcs.drawLine(personaje.getRectangle().getX()+personaje.getRectangle().getWidth()/2,personaje.getRectangle().getY()+personaje.getRectangle().getHeight()/2,xPosM,contenedor.getHeight()-yPosM);
+        grphcs.drawLine(personaje.getRectangle().getX(),personaje.getRectangle().getY(),xPosM,contenedor.getHeight()-yPosM);
         grphcs.setLineWidth(6);
         grphcs.drawOval(xPosM-10,contenedor.getHeight()-yPosM-10, 20, 20);
     }
     //dibujo todos los bloques enemigos
     public void drawBloques(Graphics grphcs){
         for (int i = 0;i<bloque.length;i++){
-            grphcs.fillRect(bloque[i].getRectangle().getX(),bloque[i].getRectangle().getY(),bloque[i].getRectangle().getWidth(),bloque[i].getRectangle().getHeight());
+            bloque[i].draw(grphcs);
         }
     }
     //dibujo informacion de las bloques como :cordenandas y velociadad
@@ -238,14 +258,20 @@ public class JumpBlock extends BasicGame{
         //dibujo una linea que representa el vector de velocidad del personaje
         grphcs.drawLine((int)personaje.getRectangle().getX()+personaje.getRectangle().getWidth()/2, (int)personaje.getRectangle().getY()+personaje.getRectangle().getHeight()/2,/*jjjaj*/(int)personaje.getRectangle().getX()+personaje.getRectangle().getWidth()/2+(int)(personaje.getvX()*ups*10), (int)personaje.getRectangle().getY()+personaje.getRectangle().getHeight()/2+(int)(personaje.getvY()*ups*10));
     }
-
-    
     
     public AppGameContainer getContenedor() {
         return contenedor;
     }
+    
     public void setContenedor(AppGameContainer contenedor) {
         this.contenedor = contenedor;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
     
 }

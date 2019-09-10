@@ -1,24 +1,15 @@
 Signature-Version: 1.0
 SHA-256-Digest-Manifest-Main-Attributes: 4qGIDsjmf8ZDczflwSf6tIdbOjZZq
  9qEfMQx6QzRtnQ=
-SHA-256-Digest-Manifest: qRTaHudCXHGHuHQv5vJF7357Gluvi1iSwjDiPeX3yUk=
+SHA-256-Digest-Manifest: J+r1FbKs55HSWUjXc7bgzgNpHXUTP2VrvauJ7by9/5I=
 Created-By: 1.7.0_65 (Oracle Corporation)
 
-Name: libjinput-linux64.so
-SHA-256-Digest: itlSELYUl2J5ZHFgLvq6aAxOZZzqbgQ/fW6jAl3YIIE=
+Name: openal.dylib
+SHA-256-Digest: gAyTEUjv6AzKYqZ5FcgwubYS25HriVTsc1sg4XETI/8=
 
-Name: libopenal.so
-SHA-256-Digest: 0U453Eu3P7bW04w5a4axEou1oK4Y9e9F4b0I+NxtE2Q=
+Name: liblwjgl.dylib
+SHA-256-Digest: cVoF2wABgck+OTPdXhffMzwaCl/dQoTSkkMklFSQU20=
 
-Name: liblwjgl.so
-SHA-256-Digest: iGLPyAWEZoixjHqD8Fzw/uJpmseIyJHED0dVAfofLVc=
-
-Name: libopenal64.so
-SHA-256-Digest: LhU9lL5n5GOySYKN+uEJoDrM+AskIPBZ379T6iqZohw=
-
-Name: libjinput-linux.so
-SHA-256-Digest: AoLpC4NiRPwzC4qiJudMshQ0l33UD+NZSDl+myCTHDE=
-
-Name: liblwjgl64.so
-SHA-256-Digest: W+SoAfmDJO5KzTP9H4lSkCfw0l3fs09QFCK+R+KA33M=
+Name: libjinput-osx.dylib
+SHA-256-Digest: lQQkGRkPznra/6DI4hCBqMPFAHRM2bjBOMa0CpaVXJg=
 

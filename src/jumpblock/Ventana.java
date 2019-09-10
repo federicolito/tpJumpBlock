@@ -98,8 +98,10 @@ public class Ventana extends JFrame{
 
                 
                 try {
+                    sm.setNombre(nombre.getText());
                     sm.getContenedor().start();
                     sm.init(sm.getContenedor());
+                    
                 } catch (SlickException ex) {
                     Logger.getLogger(Ventana.class.getName()).log(Level.SEVERE, null, ex);
                 }
